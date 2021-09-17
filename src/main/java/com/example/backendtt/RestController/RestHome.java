@@ -10,4 +10,8 @@ public class RestHome {
     public String home(){
         return "home";
     }
+    @GetMapping("/hallo")
+    public String hallo(){
+        return "hallo back";
+    }
 }

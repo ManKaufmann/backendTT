@@ -63,7 +63,7 @@ public class UserData {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "username = " + username + ")";
+                "username = " + username + ", " +
+                "userpassword = " + userpassword + ")";
     }
 }
