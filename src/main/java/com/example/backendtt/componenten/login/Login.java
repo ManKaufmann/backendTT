@@ -2,9 +2,12 @@ package com.example.backendtt.componenten.login;
 
 import com.example.backendtt.security.models.UserData;
 import io.fusionauth.jwt.Signer;
+import io.fusionauth.jwt.Verifier;
 import io.fusionauth.jwt.domain.JWT;
 import io.fusionauth.jwt.hmac.HMACSigner;
+import io.fusionauth.jwt.hmac.HMACVerifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -50,4 +53,36 @@ public class Login {
         String[] split = decodedBasicUser.split(":");
         return split;
     }
+
+    public JWT decodeJwtToken(String jwtToken) {
+
+        String encodedJWT = jwtToken.substring(7);
+
+        // Build an HMC verifier using the same secret that was used to sign the JWT
+        Verifier verifier = HMACVerifier.newVerifier(this.secret);
+
+        // Verify and decode the encoded string JWT to a rich object
+        JWT jwt = JWT.getDecoder().decode(encodedJWT, verifier);
+        return jwt;
+
+
+    }
+
+    public boolean validateToken(String jwtToken, UserDetails userDetails) {
+        JWT decodeJwtTokenjwt = this.decodeJwtToken(
+                jwtToken
+        );
+        final String username = decodeJwtTokenjwt.subject;
+        Boolean tokenExpired = isTokenExpired(decodeJwtTokenjwt);
+        return (username.equals(userDetails.getUsername()) && !tokenExpired);
+
+
+    }
+    //check if the token has expired
+    private Boolean isTokenExpired(JWT decodeJwtTokenjwt) {
+        ZonedDateTime expirationDateFromToken = decodeJwtTokenjwt.expiration;
+        boolean after = ZonedDateTime.now(ZoneOffset.UTC).isAfter( expirationDateFromToken );
+        return after;
+    }
+
 }
